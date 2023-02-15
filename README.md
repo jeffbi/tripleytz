@@ -12,4 +12,4 @@ $ cd build
 build$ cmake -DCMAKE_PREFIX_PATH:PATH=<path-to-qt-config> ..
 build$ make
 ```
-Substitute `<path-to-qt-config>` with the path tp your Qt CMake configurations. On my system it is `~/Qt/6.4.2/gcc_64`.
+Substitute `<path-to-qt-config>` with the path to your Qt CMake configurations. On my system it is `~/Qt/6.4.2/gcc_64`.
