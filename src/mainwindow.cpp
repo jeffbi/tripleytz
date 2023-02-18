@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 #include <array>
 
@@ -121,7 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
         _dice_btn[i] = new QPushButton(*_dice_pix[i], "");
         _dice_btn[i]->setFlat(true);
         _dice_btn[i]->setIconSize(_dice_pix[i]->size());
-        _dice_chk[i] = new QCheckBox(tr("keep"));
+        _dice_chk[i] = new QCheckBox(tr("Keep"));
+        _dice_chk[i]->setEnabled(false);
         QVBoxLayout *vbl{new QVBoxLayout{}};
         vbl->addWidget(_dice_btn[i]);
         vbl->addWidget(_dice_chk[i]);
@@ -129,7 +131,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
     layout->addLayout(hbl);
 
-    //_btn_roll = new QPushButton{QString("Roll! (%1)").arg(_rolls_left)};
     _btn_roll = new QPushButton{};
     auto *hlayout = new QHBoxLayout{};
     hlayout->addWidget(_btn_roll);
@@ -225,8 +226,6 @@ MainWindow::MainWindow(QWidget *parent)
     _column_single = new ScoreColumn{1, singles};
     _column_double = new ScoreColumn{2, doubles};
     _column_triple = new ScoreColumn{3, triples};
-
-
 }
 
 MainWindow::~MainWindow()
@@ -239,6 +238,21 @@ MainWindow::~MainWindow()
 
     for (auto dp : _dice_pix)
         delete dp;
+}
+
+void MainWindow::end_game()
+{
+    auto [s, d, t] = _total->get_scores();
+
+    _grand_total_score = s->value() + d->value() + t->value();
+
+    QString     msg{tr("Your final score is %1!").arg(_grand_total_score)};
+    QMessageBox mb{QMessageBox::Icon::Information, "TripleYtz", msg, QMessageBox::StandardButton::Ok, this};
+
+    mb.exec();
+
+    //TODO: Handle high scores
+    new_game();
 }
 
 void MainWindow::new_game()
@@ -258,8 +272,19 @@ void MainWindow::new_game()
     _large_straight->reset();
     _yahtzee->reset();
     _chance->reset();
+    _grand_total_score = 0;
 
     _dice.reset();
+
+    _rolls_left = 3;
+    _plays_left = 39;
+    update_roll_button();
+    _btn_roll->setEnabled(true);
+    for (auto k : _dice_chk)
+    {
+        k->setChecked(false);
+        k->setEnabled(false);
+    }
 }
 
 void MainWindow::update_dice_widgets()
@@ -316,7 +341,7 @@ int MainWindow::get_score_value(const Score *score)
 //
 void MainWindow::score_entered(Score *score)
 {
-    if (!score->has_score())
+    if (!score->has_score() && _rolls_left < 3)
     {
         //_current_score_widget = score;
         void die_0_clicked();
@@ -336,39 +361,51 @@ void MainWindow::score_exited(Score *score)
 
 void MainWindow::score_clicked(Score *score)
 {
-    if (!score->has_score() || score->previewing())
+    if ((!score->has_score() || score->previewing()) && _rolls_left < 3)
     {
         if (_current_score_widget)
             _current_score_widget->reset();
         _current_score_widget = score;
         score->set(get_score_value(score));
-        for (auto d : _dice_chk)
-            d->setChecked(false);
-        _btn_roll->setEnabled(true);
-        _rolls_left = 3;
-        update_roll_button();
+        if (--_plays_left == 0)
+        {
+            end_game();
+        }
+        else
+        {
+            for (auto d : _dice_chk)
+                d->setChecked(false);
+            _btn_roll->setEnabled(true);
+            _rolls_left = _max_rolls;
+            update_roll_button();
+        }
     }
 }
 
 void MainWindow::die_0_clicked()
 {
-    _dice_chk[0]->toggle();
+    if (_rolls_left < _max_rolls)
+        _dice_chk[0]->toggle();
 }
 void MainWindow::die_1_clicked()
 {
-    _dice_chk[1]->toggle();
+    if (_rolls_left < _max_rolls)
+        _dice_chk[1]->toggle();
 }
 void MainWindow::die_2_clicked()
 {
-    _dice_chk[2]->toggle();
+    if (_rolls_left < _max_rolls)
+        _dice_chk[2]->toggle();
 }
 void MainWindow::die_3_clicked()
 {
-    _dice_chk[3]->toggle();
+    if (_rolls_left < _max_rolls)
+        _dice_chk[3]->toggle();
 }
 void MainWindow::die_4_clicked()
 {
-    _dice_chk[4]->toggle();
+    if (_rolls_left < _max_rolls)
+        _dice_chk[4]->toggle();
 }
 
 void MainWindow::keep_0_toggled(bool checked)
@@ -394,6 +431,8 @@ void MainWindow::keep_4_toggled(bool checked)
 
 void MainWindow::roll_released()
 {
+    for (auto k : _dice_chk)
+        k->setEnabled(true);
     _dice.roll();
     if (--_rolls_left == 0)
         _btn_roll->setEnabled(false);
@@ -401,3 +440,15 @@ void MainWindow::roll_released()
     update_dice_widgets();
     _current_score_widget = nullptr;
 }
+
+void MainWindow::on_action_New_game_triggered()
+{
+    new_game();
+}
+
+
+void MainWindow::on_action_Exit_triggered()
+{
+    QApplication::quit();
+}
+

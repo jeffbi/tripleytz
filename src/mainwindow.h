@@ -30,6 +30,7 @@ public:
 
 private:
     void new_game();
+    void end_game();
     void update_dice_widgets();
     void update_roll_button();
     int get_score_value(const Score *score);
@@ -50,7 +51,15 @@ public slots:
     void keep_4_toggled(bool checked);
     void roll_released();
 
+private slots:
+    void on_action_New_game_triggered();
+
+    void on_action_Exit_triggered();
+
 private:
+    static constexpr int    _max_rolls{3};
+    static constexpr int    _max_plays{39};
+
     Ui::MainWindow *ui;
 
     Dice            _dice;
@@ -84,8 +93,8 @@ private:
     std::array<QCheckBox *, 5>      _dice_chk;
 
     QPushButton    *_btn_roll;
-    int             _rolls_left{3};
-    int             _plays_left{39};
+    int             _rolls_left{_max_rolls};
+    int             _plays_left{_max_plays};
     int             _grand_total_score{0};
 
     ScoreColumn    *_column_single{nullptr};
