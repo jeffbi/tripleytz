@@ -26,6 +26,8 @@ set(XPM_FILES
 )
 
 set(PROJECT_SOURCES
+    src/config.h
+    src/config.cpp
     src/dice.h
     src/gamescorer.h
     src/main.cpp

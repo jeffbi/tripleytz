@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QVBoxLayout>
+#include <QInputDialog>
 #include <QMessageBox>
+#include <QStandardPaths>
+#include <QVBoxLayout>
 
 #include <array>
 
@@ -54,7 +56,10 @@ MainWindow::MainWindow(QWidget *parent)
   , _dice_pix{nullptr}
   , _dice_btn{nullptr}
   , _dice_chk{nullptr}
+  , _config{QStandardPaths::writableLocation(QStandardPaths::StandardLocation::GenericConfigLocation) + "/.tripleytz"}
 {
+    _config.load();
+
     ui->setupUi(this);
 
     QWidget        *cw{ui->centralwidget};
@@ -251,7 +256,25 @@ void MainWindow::end_game()
 
     mb.exec();
 
-    //TODO: Handle high scores
+    // handle high scores
+    if (_config.is_high_score(_grand_total_score))
+    {
+        bool    ok;
+        QString name = QInputDialog::getText(this, tr("High Score!"),
+                                             tr("You made it to the high score list.\nPlease enter your name:"),
+                                             QLineEdit::Normal, _config.last_used_name(), &ok);
+        if (ok)
+        {
+            _config.last_used_name(name);
+            if (_config.try_add_high_score(_grand_total_score, name))
+            {
+                //TODO: Need a high-score list dialog here.
+                _config.save();
+            }
+        }
+    }
+
+
     new_game();
 }
 

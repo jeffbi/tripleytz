@@ -14,6 +14,7 @@ QT_END_NAMESPACE
 
 #include <array>
 
+#include "config.h"
 #include "dice.h"
 #include "score.h"
 #include "scorecolumn.h"
@@ -102,6 +103,8 @@ private:
     ScoreColumn    *_column_triple{nullptr};
 
     Score          *_current_score_widget{nullptr};
+
+    Config          _config;
 };
 
 #endif // MAINWINDOW_H
