@@ -141,7 +141,6 @@ MainWindow::MainWindow(QWidget *parent)
     auto *hlayout = new QHBoxLayout{};
     hlayout->addWidget(_btn_roll);
     layout->addLayout(hlayout);
-    update_dice_widgets();
     update_roll_button();
 
     setFixedSize(sizeHint());
@@ -199,8 +198,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_dice_chk[2], &QAbstractButton::toggled, this, &MainWindow::keep_2_toggled);
     connect(_dice_chk[3], &QAbstractButton::toggled, this, &MainWindow::keep_3_toggled);
     connect(_dice_chk[4], &QAbstractButton::toggled, this, &MainWindow::keep_4_toggled);
+    connect(&_dice, &Dice::on_die_changed, this, &MainWindow::die_changed);
 
-    connect(_btn_roll, &QPushButton::released, this, &MainWindow::roll_released);
+    connect(_btn_roll, &QPushButton::clicked, this, &MainWindow::roll_clicked);
 
     //
     // The following code sets up the ScoreColumn objects.
@@ -307,16 +307,6 @@ void MainWindow::new_game()
     {
         k->setChecked(false);
         k->setEnabled(false);
-    }
-}
-
-void MainWindow::update_dice_widgets()
-{
-    auto   &dice{_dice.dice()};
-
-    for (size_t i{0}; i < _dice.size(); ++i)
-    {
-        _dice_btn[i]->setIcon(*_dice_pix[dice[i] - 1]);
     }
 }
 
@@ -459,7 +449,13 @@ void MainWindow::keep_4_toggled(bool checked)
     _dice.select(4, checked);
 }
 
-void MainWindow::roll_released()
+void MainWindow::die_changed(int index, int value)
+{
+    _dice_btn[index]->setIcon(*_dice_pix[value - 1]);
+    _dice_btn[index]->repaint();
+}
+
+void MainWindow::roll_clicked(bool checked)
 {
     for (auto k : _dice_chk)
         k->setEnabled(true);
@@ -467,7 +463,6 @@ void MainWindow::roll_released()
     if (--_rolls_left == 0)
         _btn_roll->setEnabled(false);
     update_roll_button();
-    update_dice_widgets();
     _current_score_widget = nullptr;
 }
 

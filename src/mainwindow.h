@@ -32,7 +32,6 @@ public:
 private:
     void new_game();
     void end_game();
-    void update_dice_widgets();
     void update_roll_button();
     int get_score_value(const Score *score);
     void show_high_scores_list();
@@ -51,7 +50,8 @@ public slots:
     void keep_2_toggled(bool checked);
     void keep_3_toggled(bool checked);
     void keep_4_toggled(bool checked);
-    void roll_released();
+    void die_changed(int index, int value);
+    void roll_clicked(bool checked);
 
 private slots:
     void on_action_New_game_triggered();
