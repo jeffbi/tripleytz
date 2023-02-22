@@ -20,6 +20,11 @@ namespace {
     constexpr const char *Name{"name"};
 }
 
+///
+/// \brief Config::load Load the configuration settings and high scores
+/// collection from the file.
+///
+/// The configuration data is stored in a JSON-format file.
 void Config::load()
 {
     QFileInfo   fi(_path);
@@ -73,6 +78,10 @@ void Config::load()
     }
 }
 
+///
+/// \brief Config::save Store the configuration and high scores collection
+/// to the file
+///
 void Config::save() const
 {
     try
@@ -110,34 +119,22 @@ void Config::save() const
     }
 }
 
-bool Config::try_add_high_score(int score, const QString &name, QDateTime datetime/* = QDateTime::currentDateTime()*/)
+///
+/// \brief Config::add_high_score   Add a score to the collection of high scores.
+/// \param score    The score to be added to the high scores collection
+/// \param name     The name of the player that attained the score
+/// \param datetime The data and time the score occurred
+/// \return true if the score was successfully added, false otherwise.
+///
+/// It is usually not an error for this function to fail. The most likely cause
+/// is that there is no more room in the collection for high scores as determined
+/// by the configuration's setting for the maximum number of high scores allowed.
+bool Config::add_high_score(int score, const QString &name, QDateTime datetime/* = QDateTime::currentDateTime()*/)
 {
-    //if (_max_high_scores < 1 || (!_scores.empty() && score <= _scores.back().score))
-    //    return false;
     if (_max_high_scores < 1)
         return false;
 
-#if 0
-    if (_scores.size() < _max_high_scores)
-    {
-        _scores.emplace_back(score, datetime, name);
-    }
-    else
-    {
-        //TODO: Handle other cases!!!
-    }
-
-    // sort the vector
-    std::sort(_scores.begin(), _scores.end(), [](const HighScore &a, const HighScore &b)
-        {
-            if (a.score == b.score)
-                return a.when > b.when;
-            return a.score > b.score;
-        }
-    );
-#else
-    auto is_less = [&score](const HighScore &hs) { return hs.score < score; };
-    auto pos = std::find_if(begin(_scores), end(_scores), is_less);
+    auto pos = std::find_if(begin(_scores), end(_scores), [&score](const HighScore &hs) { return hs.score < score; });
 
     if (pos == end(_scores))
     {
@@ -150,7 +147,6 @@ bool Config::try_add_high_score(int score, const QString &name, QDateTime dateti
     _scores.emplace(pos, score, datetime, name);
     while (_scores.size() > _max_high_scores)   // should happen no more than once
         _scores.pop_back();
-#endif
 
     return true;
 }

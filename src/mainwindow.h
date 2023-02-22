@@ -35,6 +35,7 @@ private:
     void update_dice_widgets();
     void update_roll_button();
     int get_score_value(const Score *score);
+    void show_high_scores_list();
 
 public slots:
     void score_entered(Score *score);
@@ -54,8 +55,8 @@ public slots:
 
 private slots:
     void on_action_New_game_triggered();
-
     void on_action_Exit_triggered();
+    void on_action_High_Scores_triggered();
 
 private:
     static constexpr int    _max_rolls{3};

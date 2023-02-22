@@ -9,6 +9,7 @@
 #include <array>
 
 #include "gamescorer.h"
+#include "highscoresdialog.h"
 #include "ace.xpm"
 #include "two.xpm"
 #include "three.xpm"
@@ -266,14 +267,13 @@ void MainWindow::end_game()
         if (ok)
         {
             _config.last_used_name(name);
-            if (_config.try_add_high_score(_grand_total_score, name))
+            if (_config.add_high_score(_grand_total_score, name))
             {
-                //TODO: Need a high-score list dialog here.
                 _config.save();
+                show_high_scores_list();
             }
         }
     }
-
 
     new_game();
 }
@@ -322,7 +322,7 @@ void MainWindow::update_dice_widgets()
 
 void MainWindow::update_roll_button()
 {
-    _btn_roll->setText(tr("Roll! (%1)").arg(_rolls_left));
+    _btn_roll->setText(tr("Roll! (%1 left)").arg(_rolls_left));
 }
 
 int MainWindow::get_score_value(const Score *score)
@@ -356,6 +356,13 @@ int MainWindow::get_score_value(const Score *score)
         return sr->get_score_value(_dice, [](const GameScorer &gs){return gs.chance();});
     else
         return 0;
+}
+
+void MainWindow::show_high_scores_list()
+{
+    HighScoresDialog    dlg{_config, this};
+
+    dlg.exec();
 }
 
 
@@ -473,5 +480,11 @@ void MainWindow::on_action_New_game_triggered()
 void MainWindow::on_action_Exit_triggered()
 {
     QApplication::quit();
+}
+
+
+void MainWindow::on_action_High_Scores_triggered()
+{
+    show_high_scores_list();
 }
 

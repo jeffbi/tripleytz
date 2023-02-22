@@ -30,6 +30,8 @@ set(PROJECT_SOURCES
     src/config.cpp
     src/dice.h
     src/gamescorer.h
+    src/highscoresdialog.cpp
+    src/highscoresdialog.h
     src/main.cpp
     src/mainwindow.cpp
     src/mainwindow.h
