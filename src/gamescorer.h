@@ -1,6 +1,14 @@
 #ifndef GAMESCORER_H
 #define GAMESCORER_H
 
+/**************************************************************************
+* Copyright (c) 2023 by Jeff Bienstadt                                    *
+*                                                                         *
+* This file is part of the tripleytz project.                             *
+*                                                                         *
+* Released under the MIT license. See the file LICENSE for more details.  *
+**************************************************************************/
+
 #include <array>
 
 #include "dice.h"

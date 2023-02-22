@@ -1,6 +1,14 @@
 #ifndef SCOREROW_H
 #define SCOREROW_H
 
+/**************************************************************************
+* Copyright (c) 2023 by Jeff Bienstadt                                    *
+*                                                                         *
+* This file is part of the tripleytz project.                             *
+*                                                                         *
+* Released under the MIT license. See the file LICENSE for more details.  *
+**************************************************************************/
+
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QLabel>
