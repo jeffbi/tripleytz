@@ -25,7 +25,7 @@ class Score : public QPushButton
 
 public:
     ///
-    /// \brief  Constructs a Score widget.
+    /// \brief  Construct a Score widget.
     /// \param parent   Pointer to the parent widget
     ///
     explicit Score(QWidget *parent = nullptr)
@@ -33,12 +33,12 @@ public:
     {}
 
     ///
-    /// Destroys a Score widget.
+    /// Destroy a Score widget.
     ~Score()
     {}
 
     ///
-    /// \brief  Determines if a Score widget contains a score.
+    /// \brief  Determine if a Score widget contains a score.
     /// \return True if the widget contains a score, false otherwise.
     ///
     bool has_score() const noexcept
@@ -47,7 +47,7 @@ public:
     }
 
     ///
-    /// \brief  Return the score's value. The score must have a score value.
+    /// \brief  Retrieve the score's value. The score must have a score value.
     /// \return The score value.
     ///
     int value() const
@@ -55,6 +55,15 @@ public:
         return _score.value();
     }
 
+    ///
+    /// \brief  Retrieve the score's value if it has one, otherwise return the value in the \c or_value parameter.
+    /// \param or_value The alternate value to return if the score has not value
+    /// \return Either the current value of the score or the alternate value specified in the \c or_value parameter.
+    ///
+    int value_or(int or_value) const
+    {
+        return _score.value_or(or_value);
+    }
     ///
     /// \brief  Set the score value.
     /// \param value    The value to be set.
@@ -83,8 +92,6 @@ public:
     void preview_score(int value)
     {
         _previewing = true;
-        //setText(QString::number(value));
-        //set(value);
         _score = value;
         update();
     }

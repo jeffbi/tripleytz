@@ -43,11 +43,13 @@ private:
     void update_roll_button();
     int get_score_value(const Score *score);
     void show_high_scores_list();
+    void update_grand_total(ScoreRow *row);
 
 public slots:
     void score_entered(Score *score);
     void score_exited(Score *score);
     void score_clicked(Score *score);
+    void row_changed(ScoreRow *row);
     void die_0_clicked();
     void die_1_clicked();
     void die_2_clicked();
@@ -95,8 +97,8 @@ private:
     ScoreRow       *_upper_section_total;
     ScoreRow       *_combined_total;
 
-    ScoreRow       *_total;     //TODO: This sould be a separate type, uncolored, for singled/douibled/tripled scores
-    ScoreRow       *_grand_total{nullptr};  //TODO: need separate type for this one-score field
+    ScoreRow       *_total;         //TODO: This sould be a separate type, uncolored, for singled/doubled/tripled scores
+    GrandTotalRow  *_grand_total;
 
     std::array<QPixmap *, 6>        _dice_pix;
     std::array<QPushButton *, 5>    _dice_btn;
@@ -105,7 +107,6 @@ private:
     QPushButton    *_btn_roll;
     int             _rolls_left{_max_rolls};
     int             _plays_left{_max_plays};
-    int             _grand_total_score{0};
 
     ScoreColumn    *_column_single{nullptr};
     ScoreColumn    *_column_double{nullptr};

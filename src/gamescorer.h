@@ -13,11 +13,18 @@
 
 #include "dice.h"
 
+///
+/// \brief Engine for calculateing Yahtzee scores based on rolled dice.
+///
 class GameScorer
 {
 public:
+    ///
+    /// \brief  Construct a GameScorer object from a Dice object.
+    /// \param dice Reference to a Dice object containing rolled dice.
+    ///
     GameScorer(const Dice &dice)
-      : _pip_counts{0/*, 0, 0, 0, 0, 0*/}
+      : _pip_counts{0, 0, 0, 0, 0, 0}
     {
         for (const auto die : dice.dice())
             ++_pip_counts[die - 1];
@@ -111,6 +118,7 @@ public:
     {
         return sum_of_pips();
     }
+
 private:
     int sum_of_pips() const noexcept
     {

@@ -15,6 +15,7 @@
 #include <QString>
 
 #include <functional>
+#include <optional>
 #include <tuple>
 
 #include "dice.h"
@@ -45,7 +46,7 @@ public:
         _score_triple->setStyleSheet("Score {background-color: rgb(242, 76, 80); color: black}");
         _score_triple->setFixedWidth(score_width);
 
-        //TODO: Layout the child widgets
+        // Lay out the child widgets
         QHBoxLayout    *layout{new QHBoxLayout(this)};
         QHBoxLayout    *text_layout{new QHBoxLayout()};
 
@@ -68,15 +69,14 @@ public:
         connect(_score_triple, &Score::on_enter, this, &ScoreRow::score_entered);
         connect(_score_triple, &Score::on_leave, this, &ScoreRow::score_exited);
         connect(_score_triple, &Score::clicked, this, &ScoreRow::triple_clicked);
+
+        connect(_score_single, &Score::on_changed, this, &ScoreRow::score_changed);
+        connect(_score_double, &Score::on_changed, this, &ScoreRow::score_changed);
+        connect(_score_triple, &Score::on_changed, this, &ScoreRow::score_changed);
     }
 
     ~ScoreRow()
     {}
-
-    bool is_full() const noexcept
-    {
-        return _score_single->has_score() && _score_double->has_score() && _score_triple->has_score();
-    }
 
     bool ui_enabled() const noexcept
     {
@@ -116,6 +116,7 @@ signals:
     void on_enter(Score *score);
     void on_exit(Score *score);
     void on_click(Score *score);
+    void on_changed(ScoreRow *row);
 
 private slots:
     void score_entered(Score *score)
@@ -130,6 +131,11 @@ private slots:
     {
         emit on_click(score);
     }
+    void score_changed(Score *score)
+    {
+        emit on_changed(this);
+    }
+
     void single_clicked()
     {
         emit on_click(_score_single);
@@ -143,13 +149,48 @@ private slots:
         emit on_click(_score_triple);
     }
 
-
 private:
     bool    _ui_enabled;
     QLabel *_label;
     Score  *_score_single;
     Score  *_score_double;
     Score  *_score_triple;
+};
+
+class GrandTotalRow : public QWidget
+{
+public:
+    GrandTotalRow(QWidget *parent = nullptr)
+      : QWidget{parent}
+      , _label{new QLabel{tr("Grand Total"), this}}
+      , _button{new QPushButton{this}}
+    {
+        _button->setFixedWidth(120);
+        _button->setStyleSheet("QPushButton {background-color: rgb(250, 250, 250); color: black}");
+        _label->setAlignment(Qt::AlignRight);
+
+        QHBoxLayout    *layout{new QHBoxLayout{this}};
+
+        layout->addWidget(_label);
+        layout->addWidget(_button);
+    }
+
+    void total(std::optional<int> value)
+    {
+        static QString empty{""};
+
+        _value = value;
+        _button->setText(value.has_value() ? QString::number(value.value()) : empty);
+    }
+    std::optional<int> total()
+    {
+        return _value;
+    }
+
+private:
+    std::optional<int>  _value;
+    QLabel             *_label;
+    QPushButton        *_button;
 };
 
 #endif // SCOREROW_H

@@ -15,6 +15,7 @@
 #include <QVBoxLayout>
 
 #include <array>
+#include <cassert>
 
 #include "gamescorer.h"
 #include "highscoresdialog.h"
@@ -111,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(_yahtzee);
     layout->addWidget(_chance);
 
-    layout->addItem(new QSpacerItem{0,4});
+    layout->addItem(new QSpacerItem{0, 4});
     layout->addWidget(_lower_section_total);
     layout->addWidget(_upper_section_total);
     layout->addWidget(_combined_total);
@@ -121,7 +122,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     layout->addWidget(_total);
     _total->ui_enabled(false);
-    //_game_total  = new ScoreWidget{"Grand Total", cw};
+
+    layout->addItem(new QSpacerItem{0, 4});
+    _grand_total = new GrandTotalRow{this};
+    layout->addWidget(_grand_total);
+
 
     _dice_pix[0] = new QPixmap(ace_xpm);
     _dice_pix[1] = new QPixmap(two_xpm);
@@ -196,6 +201,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_chance, &ScoreRow::on_exit, this, &MainWindow::score_exited);
     connect(_chance, &ScoreRow::on_click, this, &MainWindow::score_clicked);
 
+    connect(_total, &ScoreRow::on_changed, this, &MainWindow::row_changed);
+
     connect(_dice_btn[0], &QPushButton::clicked, this, &MainWindow::die_0_clicked);
     connect(_dice_btn[1], &QPushButton::clicked, this, &MainWindow::die_1_clicked);
     connect(_dice_btn[2], &QPushButton::clicked, this, &MainWindow::die_2_clicked);
@@ -256,17 +263,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::end_game()
 {
-    auto [s, d, t] = _total->get_scores();
+    assert(_grand_total->total().has_value());
+    int game_score = _grand_total->total().value_or(0);
 
-    _grand_total_score = s->value() + d->value() + t->value();
-
-    QString     msg{tr("Your final score is %1!").arg(_grand_total_score)};
+    QString     msg{tr("Your final score is %1!").arg(game_score)};
     QMessageBox mb{QMessageBox::Icon::Information, "TripleYtz", msg, QMessageBox::StandardButton::Ok, this};
 
     mb.exec();
 
     // handle high scores
-    if (_config.is_high_score(_grand_total_score))
+    if (_config.is_high_score(game_score))
     {
         bool    ok;
         QString name = QInputDialog::getText(this, tr("High Score!"),
@@ -275,7 +281,7 @@ void MainWindow::end_game()
         if (ok)
         {
             _config.last_used_name(name);
-            if (_config.add_high_score(_grand_total_score, name))
+            if (_config.add_high_score(game_score, name))
             {
                 _config.save();
                 show_high_scores_list();
@@ -303,7 +309,7 @@ void MainWindow::new_game()
     _large_straight->reset();
     _yahtzee->reset();
     _chance->reset();
-    _grand_total_score = 0;
+    update_grand_total(_total);
 
     _dice.reset();
 
@@ -363,6 +369,33 @@ void MainWindow::show_high_scores_list()
     dlg.exec();
 }
 
+void MainWindow::update_grand_total(ScoreRow *row)
+{
+    std::optional<int>  opt;
+    int total{0};
+    auto [s, d, t] = row->get_scores();
+
+    if (s->has_score())
+    {
+        total += s->value();
+        opt = total;
+    }
+
+    if (d->has_score())
+    {
+        total += d->value();
+        opt = total;
+    }
+
+    if (t->has_score())
+    {
+        total += t->value();
+        opt = total;
+    }
+
+    _grand_total->total(opt);
+}
+
 
 //
 // Slots
@@ -408,6 +441,17 @@ void MainWindow::score_clicked(Score *score)
             update_roll_button();
         }
     }
+}
+
+///
+/// \brief  Slot for handling when a ScoreRow changes.
+/// \param row  Pointer to the row that changed.
+///
+/// This slot should only be attached to the row holding the three final column scores.
+///
+void MainWindow::row_changed(ScoreRow *row)
+{
+    update_grand_total(row);
 }
 
 void MainWindow::die_0_clicked()
@@ -490,4 +534,3 @@ void MainWindow::on_action_High_Scores_triggered()
 {
     show_high_scores_list();
 }
-

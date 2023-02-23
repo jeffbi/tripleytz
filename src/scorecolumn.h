@@ -188,9 +188,9 @@ private slots:
                 _lower_section_total->reset();
         }
 
-        if (_lower_section_total->has_score() && _upper_section_total->has_score())
+        if (_lower_section_total->has_score() || _upper_section_total->has_score())
         {
-            _combined_total->set(_upper_section_total->value() + _lower_section_total->value());
+            _combined_total->set(_upper_section_total->value_or(0) + _lower_section_total->value_or(0));
             _total->set(_combined_total->value() * _multiplier);
         }
         else
