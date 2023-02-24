@@ -34,7 +34,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(Config &config, QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
@@ -72,7 +72,7 @@ private:
     static constexpr int    _max_rolls{3};
     static constexpr int    _max_plays{39};
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow *_ui;
 
     Dice            _dice;
 
@@ -114,7 +114,7 @@ private:
 
     Score          *_current_score_widget{nullptr};
 
-    Config          _config;
+    Config         &_config;
 };
 
 #endif // MAINWINDOW_H

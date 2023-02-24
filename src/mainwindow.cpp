@@ -11,7 +11,6 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QStandardPaths>
 #include <QVBoxLayout>
 
 #include <array>
@@ -40,9 +39,9 @@ void set_score_arrays(const ScoreRow *row,
 }
 }   // anonymous namespace
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(Config &config, QWidget *parent)
   : QMainWindow(parent)
-  , ui(new Ui::MainWindow)
+  , _ui(new Ui::MainWindow)
   , _aces{new ScoreRow{tr("Aces")}}
   , _twos{new ScoreRow{tr("Twos")}}
   , _threes{new ScoreRow{tr("Threes")}}
@@ -66,13 +65,11 @@ MainWindow::MainWindow(QWidget *parent)
   , _dice_pix{nullptr}
   , _dice_btn{nullptr}
   , _dice_chk{nullptr}
-  , _config{QStandardPaths::writableLocation(QStandardPaths::StandardLocation::GenericConfigLocation) + "/.tripleytz"}
+  , _config{config}
 {
-    _config.load();
+    _ui->setupUi(this);
 
-    ui->setupUi(this);
-
-    QWidget        *cw{ui->centralwidget};
+    QWidget        *cw{_ui->centralwidget};
     QVBoxLayout    *layout{new QVBoxLayout{cw}};
 
     layout->setSpacing(0);
@@ -119,6 +116,21 @@ MainWindow::MainWindow(QWidget *parent)
     _lower_section_total->ui_enabled(false);
     _upper_section_total->ui_enabled(false);
     _combined_total->ui_enabled(false);
+
+    QHBoxLayout *mult_layout{new QHBoxLayout{}};
+    mult_layout->addStretch();
+
+    // Lay out the multiplier indicators just above the total score boxes.
+    auto [s, d, t] = _total->get_scores();
+    for (int i{1}; i < 4; ++i)
+    {
+        QLabel *mult_label{new QLabel{tr("x%1").arg(i)}};
+        mult_label->setFixedWidth(s->width());  // Make the label width the same as the scoring box.
+        mult_label->setAlignment(Qt::AlignHCenter | Qt::AlignHCenter);
+        mult_layout->addWidget(mult_label);
+    }
+    mult_layout->addSpacing(8);
+    layout->addLayout(mult_layout);
 
     layout->addWidget(_total);
     _total->ui_enabled(false);
@@ -251,7 +263,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete _ui;
 
     delete _column_single;
     delete _column_double;

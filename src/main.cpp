@@ -10,7 +10,10 @@
 
 #include <QApplication>
 #include <QLocale>
+#include <QStandardPaths>
 #include <QTranslator>
+
+#include "config.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +31,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    MainWindow w;
+    Config  config{QStandardPaths::writableLocation(QStandardPaths::StandardLocation::GenericConfigLocation) + "/.tripleytz"};
+    config.load();
+    MainWindow w(config);
     w.show();
     return a.exec();
 }
