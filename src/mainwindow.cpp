@@ -153,6 +153,7 @@ MainWindow::MainWindow(Config &config, QWidget *parent)
         _dice_btn[i] = new QPushButton(*_dice_pix[i], "");
         _dice_btn[i]->setFlat(true);
         _dice_btn[i]->setIconSize(_dice_pix[i]->size());
+        _dice_btn[i]->setFixedSize(_dice_pix[i]->size());
         _dice_chk[i] = new QCheckBox(tr("Keep"));
         _dice_chk[i]->setEnabled(false);
         QVBoxLayout *vbl{new QVBoxLayout{}};
