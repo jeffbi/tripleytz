@@ -171,6 +171,8 @@ MainWindow::MainWindow(Config &config, QWidget *parent)
         vbl->addWidget(_dice_btn[i]);
         vbl->addWidget(_dice_chk[i]);
         hbl->addLayout(vbl);
+        if (i < 4)
+            hbl->addSpacing(4);
     }
     layout->addLayout(hbl);
 
