@@ -38,8 +38,7 @@ public:
     /// \brief Construct a Dice object.
     ///
     Dice()
-      : _rd{}
-      , _gen{_rd()}
+      : _gen{std::random_device{}()}
       , _distr{1, 6}
       , _bounces_distr{4, 20}
       , _dice{1, 2, 3, 4, 5}
@@ -138,7 +137,7 @@ signals:
     void on_die_changed(int index, int value);
 
 private:
-    std::random_device  _rd;
+    //std::random_device  _rd;
     std::mt19937        _gen;
     std::uniform_int_distribution<> _distr;
     std::uniform_int_distribution<> _bounces_distr;
