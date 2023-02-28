@@ -52,7 +52,7 @@ void set_score_arrays(const ScoreRow *row,
 
 MainWindow::MainWindow(Config &config, QWidget *parent)
   : QMainWindow(parent)
-  , _ui(new Ui::MainWindow)
+  , ui(new Ui::MainWindow)
   , _aces{new ScoreRow{tr("Aces")}}
   , _twos{new ScoreRow{tr("Twos")}}
   , _threes{new ScoreRow{tr("Threes")}}
@@ -78,9 +78,9 @@ MainWindow::MainWindow(Config &config, QWidget *parent)
   , _dice_chk{nullptr}
   , _config{config}
 {
-    _ui->setupUi(this);
+    ui->setupUi(this);
 
-    QWidget        *cw{_ui->centralwidget};
+    QWidget        *cw{ui->centralwidget};
     QVBoxLayout    *layout{new QVBoxLayout{cw}};
 
     layout->setSpacing(0);
@@ -180,6 +180,8 @@ MainWindow::MainWindow(Config &config, QWidget *parent)
     auto *hlayout = new QHBoxLayout{};
     hlayout->addWidget(_btn_roll);
     layout->addLayout(hlayout);
+
+    enable_undo(false);
     update_roll_button();
 
     setFixedSize(sizeHint());
@@ -277,7 +279,7 @@ MainWindow::MainWindow(Config &config, QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete _ui;
+    delete ui;
 
     delete _column_single;
     delete _column_double;
@@ -343,6 +345,7 @@ void MainWindow::new_game()
     _plays_left = 39;
     update_roll_button();
     _btn_roll->setEnabled(true);
+    enable_undo(false);
     for (auto k : _dice_chk)
     {
         k->setChecked(false);
@@ -463,10 +466,17 @@ void MainWindow::score_clicked(Score *score)
             for (auto d : _dice_chk)
                 d->setChecked(false);
             _btn_roll->setEnabled(true);
+            _undo_rolls_left = _rolls_left;
             _rolls_left = _max_rolls;
+            enable_undo(true);
             update_roll_button();
         }
     }
+}
+
+void MainWindow::enable_undo(bool enabled)
+{
+    ui->action_Undo->setEnabled(enabled);
 }
 
 ///
@@ -542,6 +552,7 @@ void MainWindow::roll_clicked(bool checked)
         _btn_roll->setEnabled(false);
     update_roll_button();
     _current_score_widget = nullptr;
+    enable_undo(false);
 }
 
 void MainWindow::on_action_New_game_triggered()
@@ -559,4 +570,18 @@ void MainWindow::on_action_Exit_triggered()
 void MainWindow::on_action_High_Scores_triggered()
 {
     show_high_scores_list();
+}
+
+void MainWindow::on_action_Undo_triggered()
+{
+    // This should cover the basics of undo.
+    // More to come once Yahtzee bonus/wildcard code is in place.
+    if (_current_score_widget)
+    {
+        _current_score_widget->reset();
+        _current_score_widget = nullptr;
+        _rolls_left = _undo_rolls_left;
+        update_roll_button();
+        enable_undo(false);
+    }
 }

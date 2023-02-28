@@ -55,6 +55,7 @@ private:
     int get_score_value(const Score *score);
     void show_high_scores_list();
     void update_grand_total(ScoreRow *row);
+    void enable_undo(bool enabled);
 
 public slots:
     void score_entered(Score *score);
@@ -79,11 +80,13 @@ private slots:
     void on_action_Exit_triggered();
     void on_action_High_Scores_triggered();
 
+    void on_action_Undo_triggered();
+
 private:
     static constexpr int    _max_rolls{3};
     static constexpr int    _max_plays{39};
 
-    Ui::MainWindow *_ui;
+    Ui::MainWindow *ui;
 
     Dice            _dice;
 
@@ -117,6 +120,7 @@ private:
 
     QPushButton    *_btn_roll;
     int             _rolls_left{_max_rolls};
+    int             _undo_rolls_left{_max_rolls};
     int             _plays_left{_max_plays};
 
     ScoreColumn    *_column_single{nullptr};

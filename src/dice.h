@@ -110,7 +110,7 @@ public:
                     --bounces[i];
                     _dice[i] = _distr(_gen);
                     emit on_die_changed(i, _dice[i]);
-                    QThread::msleep(10);
+                    QThread::msleep(20);
                 }
             }
         }
@@ -137,7 +137,6 @@ signals:
     void on_die_changed(int index, int value);
 
 private:
-    //std::random_device  _rd;
     std::mt19937        _gen;
     std::uniform_int_distribution<> _distr;
     std::uniform_int_distribution<> _bounces_distr;

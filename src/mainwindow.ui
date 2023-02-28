@@ -28,7 +28,9 @@
      <string>Game</string>
     </property>
     <addaction name="action_New_game"/>
+    <addaction name="action_Undo"/>
     <addaction name="action_High_Scores"/>
+    <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
    <addaction name="menuGame"/>
@@ -47,6 +49,14 @@
   <action name="action_High_Scores">
    <property name="text">
     <string>&amp;High Scores...</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
    </property>
   </action>
  </widget>
