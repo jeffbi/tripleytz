@@ -581,6 +581,7 @@ void MainWindow::on_action_Undo_triggered()
         _current_score_widget->reset();
         _current_score_widget = nullptr;
         _rolls_left = _undo_rolls_left;
+        ++_plays_left;
         update_roll_button();
         enable_undo(false);
     }
