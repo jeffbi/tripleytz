@@ -1,6 +1,8 @@
 # tripleytz
 An implementation of the classic game "Triple Yahtzee".
 
+![Game image](tripleytz.png)
+
 ## Building From Source
 `tripleytz` requires the `CMake` build system, the `Qt6` platform, and a C++17 compatible compiler. The project my be built either by loading the CMakeLists.txt file into QtCreator and building from there, or from the command line shell using CMake directly.
 
